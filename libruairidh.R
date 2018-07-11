@@ -3,6 +3,9 @@
 #(c) Grove Capital Management 2018
 #updated 11/07/2018
 
+#not %in% function
+'%!in%'<-function(x,y)!('%in%'(x,y))
+
 sqlize<-function(x){
                       out<-paste0("'",as.character(x[1]),"'")
   
@@ -11,12 +14,15 @@ sqlize<-function(x){
                       }
                       return(out)
 }
+# group integers into fives (dividend segmentation)
 tofive<-function(x){
   x<-ceiling(x/5)*5
   y<-x-5
   z<-paste0(y,'-',x)
   return(z)
 }
+
+#break down query to database to allow selection of 000's of results by reference number
 superQuery<-function(db, queryString, df,IDs,groups, stringsAsFactors = F){
   require(RODBC)
   sqlize<-function(x){
@@ -55,6 +61,7 @@ superQuery<-function(db, queryString, df,IDs,groups, stringsAsFactors = F){
 
 }
 
+##rough mesure of uniqueness of strings
 distinguish <- function(x,from=15){
   top=from
   distinction = vector()
@@ -66,7 +73,7 @@ distinguish <- function(x,from=15){
   return(distinction)
 }
 
-
+## more fuzzy string analysis
 driver <- function(x,from=15) {
   require(stringi)
   top=from
