@@ -1,3 +1,59 @@
+## library functions for iva analysis and database connections
+#by: Ruairidh Cumming
+#(c) Grove Capital Management 2018
+#updated 11/07/2018
+
+sqlize<-function(x){
+                      out<-paste0("'",as.character(x[1]),"'")
+  
+                    for (i in x[2:length(x)]){
+                        out<-paste0(out,",'",as.character(i),"'")
+                      }
+                      return(out)
+}
+tofive<-function(x){
+  x<-ceiling(x/5)*5
+  y<-x-5
+  z<-paste0(y,'-',x)
+  return(z)
+}
+superQuery<-function(db, queryString, df,IDs,groups, stringsAsFactors = F){
+  require(RODBC)
+  sqlize<-function(x){
+    out<-paste0("'",as.character(x[1]),"'")
+
+    for (i in x[2:length(x)]){
+      if(!is.na(i)){
+        out<-paste0(out,",'",as.character(i),"'")
+      }
+    }
+    return(out)
+  }
+  unique(as.character(df[,groups]))
+
+  for ( id in unique(as.character(df[,groups]))){
+    print(id)
+
+    SQLIDs<-sqlize(unique(df[,IDs][df[,groups]==id]))##get accounts for each dealname
+
+
+    fullQueryString <-paste0(queryString," (",SQLIDs,")")
+    moreSQL<-sqlQuery(db,fullQueryString,stringsAsFactors = stringsAsFactors )
+    if (exists("optdata")){
+
+      optdata<-rbind(optdata,moreSQL)
+    }else{
+      optdata<-moreSQL
+    }
+  }
+  if(dim(optdata)[1]==0){
+
+    warning("No data returned with given IDs")
+  }
+
+  return (optdata)
+
+}
 
 distinguish <- function(x,from=15){
   top=from
